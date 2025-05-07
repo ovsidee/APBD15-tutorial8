@@ -50,8 +50,31 @@ public class ClientsController : ControllerBase
     }
 
     [HttpPut("{id}/trips/{tripId}")]
-    public async Task<IActionResult> UpdateClient(int id, int tripId, [FromBody] Client trip, CancellationToken cancellationToken)
+    public async Task<IActionResult> RegisterClientToTrip(int id, int tripId, CancellationToken cancellationToken)
     {
-        
+        var result = await _clientsService.RegisterClientToTripAsync(id, tripId, cancellationToken);
+
+        return result switch
+        {
+            "ClientNotFound" => NotFound("Client not found."),
+            "TripNotFound" => NotFound("Trip not found."),
+            "TripFull" => BadRequest("Trip has reached the maximum number of participants."),
+            "AlreadyRegistered" => Conflict("Client is already registered for this trip."),
+            "Success" => Ok("Client registered to trip successfully."),
+            _ => StatusCode(500, "An error occurred while registering the client.")
+        };
+    }
+
+    [HttpDelete("{id}/trips/{tripId}")]
+    public async Task<IActionResult> UnregisterClientFromTrip(int id, int tripId, CancellationToken cancellationToken)
+    {
+        var result = await _clientsService.UnregisterClientFromTripAsync(id, tripId, cancellationToken);
+
+        return result switch
+        {
+            "NotRegistered" => NotFound("Registration not found."),
+            "Success" => Ok("Client successfully unregistered from trip."),
+            _ => StatusCode(500, "An error occurred while unregistering the client.")
+        };
     }
 }
