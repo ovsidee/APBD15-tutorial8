@@ -151,8 +151,7 @@ public class ClientsService : IClientsService
 
         return "Success";
     }
-
-
+    
     public async Task<string> UnregisterClientFromTripAsync(int clientId, int tripId, CancellationToken cancellationToken)
     {
         await using var con = new SqlConnection(ConnectionString);
